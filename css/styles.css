@@ -1,0 +1,12 @@
+.contenedor {
+    background: blue;
+    padding: 20px;
+    width: 300px;
+}
+
+.texto {
+    width: 250px;
+    padding: 10px;
+    background: beige;
+    border-color: aliceblue;
+}
