@@ -1,16 +1,115 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
-    <link rel="stylesheet" href="css/styles.css">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Estructura de un HTML</title>
+    <title>Portal de Evaluaciones de Proyectos</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
-    <h1>Hola, esta es mi pagina web personal</h1>
-    <p><a href="seguindo.html">Ir a otra pagina</a></p>
-    <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Sunt quam, qui pariatur ullam ipsam voluptatibus nihil sequi corporis, est iure maxime perferendis culpa ex quae tenetur vitae consequatur voluptas magnam?</p>
-    <img src="images.jpg" alt="">
-    <script src="js/scripts.js"></script>
+
+    <header>
+        <h1>Portal de Proyectos Estudiantiles</h1>
+        <div id="userHeader" class="hidden">
+            <span class="user-badge"><span id="headerUserName"></span> (<span id="headerUserTeam"></span>)</span>
+            <button class="btn-logout" onclick="logout()">Cerrar Sesión</button>
+        </div>
+    </header>
+
+    <main>
+        <!-- VISTA: LOGIN -->
+        <section id="viewLogin" class="card" style="max-width: 440px; margin: 60px auto;">
+            <h2>Iniciar Sesión</h2>
+            <p class="subtitle">Ingresa con tu correo institucional y contraseña.</p>
+            <div class="form-group">
+                <label>Correo Electrónico</label>
+                <input type="email" id="loginEmail" placeholder="alumno@escuela.edu">
+            </div>
+            <div class="form-group">
+                <label>Contraseña</label>
+                <input type="password" id="loginPass" placeholder="••••••••">
+            </div>
+            <button class="btn" style="width: 100%;" onclick="login()" id="btnLogin">Ingresar</button>
+        </section>
+
+        <!-- VISTA: CREAR CONTRASEÑA -->
+        <section id="viewSetPassword" class="card hidden" style="max-width: 440px; margin: 60px auto;">
+            <h2>Crear Contraseña</h2>
+            <p class="subtitle">Es tu primer ingreso. Por favor establece una contraseña segura.</p>
+            <div class="form-group">
+                <label>Nueva Contraseña</label>
+                <input type="password" id="newPass" placeholder="••••••••">
+            </div>
+            <button class="btn" style="width: 100%;" onclick="saveNewPassword()">Guardar Contraseña</button>
+        </section>
+
+        <!-- VISTA: DASHBOARD PRINCIPAL -->
+        <section id="viewDashboard" class="hidden">
+            <div class="card">
+                <h2>Panel de Control</h2>
+                <p class="subtitle">Sube el enlace de tu video, agrega tus preguntas de evaluación y califica los proyectos de tus compañeros.</p>
+                
+                <!-- SECCIÓN: SUBIR VIDEO (Si no lo ha subido) -->
+                <div id="sectionUploadVideo" class="hidden" style="margin-top: 24px; padding-top: 24px; border-top: 1px solid var(--border);">
+                    <h3 style="font-size: 1.2rem; margin-bottom: 12px;">1. Subir Enlace de Video del Equipo</h3>
+                    <p class="subtitle">Ingresa el enlace compartido de Google Drive de tu video.</p>
+                    <div style="display: flex; gap: 12px;">
+                        <input type="url" id="inputVideoLink" placeholder="https://drive.google.com/file/d/.../view" style="flex: 1;">
+                        <button class="btn" onclick="uploadVideo()">Subir Video</button>
+                    </div>
+                </div>
+
+                <!-- SECCIÓN: SUBIR PREGUNTAS (Una vez subido el video) -->
+                <div id="sectionUploadQuestions" class="hidden" style="margin-top: 24px; padding-top: 24px; border-top: 1px solid var(--border);">
+                    <h3 style="font-size: 1.2rem; margin-bottom: 12px;">2. Configurar Preguntas del Cuestionario (Máximo 5)</h3>
+                    <p class="subtitle">Agrega preguntas para que otros equipos respondan al finalizar su evaluación.</p>
+                    <div id="questionsFormList"></div>
+                    <button class="btn btn-secondary" onclick="addQuestionField()" style="margin-top: 12px;">+ Agregar Pregunta</button>
+                    <br><br>
+                    <button class="btn" onclick="submitQuestions()">Guardar Cuestionario</button>
+                </div>
+            </div>
+
+            <h3 style="margin: 32px 0 16px; font-size: 1.4rem;">Proyectos de los Equipos</h3>
+            <div id="teamsGrid" class="grid-projects">
+                <!-- Tarjetas generadas dinámicamente -->
+            </div>
+        </section>
+    </main>
+
+    <!-- MODAL DE VISUALIZACIÓN Y VOTACIÓN -->
+    <div id="modalEvaluation" class="modal-overlay">
+        <div class="modal-content">
+            <button class="close-modal" onclick="closeModal()">×</button>
+            <h2 id="modalTeamTitle" style="margin-bottom: 16px;">Evaluación de Equipo</h2>
+            
+            <div class="video-container">
+                <iframe id="modalVideoFrame" src="" allowfullscreen></iframe>
+            </div>
+
+            <div id="votingSection">
+                <h3 style="font-size: 1.1rem; margin-bottom: 12px;">Califica la presentación:</h3>
+                <div class="vote-options">
+                    <div class="vote-btn" onclick="selectVote('Mal', this)">😞 Mal</div>
+                    <div class="vote-btn" onclick="selectVote('Regular', this)">😐 Regular</div>
+                    <div class="vote-btn" onclick="selectVote('Bien', this)">😊 Bien</div>
+                    <div class="vote-btn" onclick="selectVote('Excelente', this)">🤩 Excelente</div>
+                </div>
+                <button id="btnContinueEval" class="btn hidden" onclick="showFormSection()">Continuar al Cuestionario</button>
+            </div>
+
+            <div id="formQuestionsSection" class="hidden" style="margin-top: 24px; border-top: 1px solid var(--border); padding-top: 24px;">
+                <h3 style="font-size: 1.1rem; margin-bottom: 16px;">Preguntas del Equipo</h3>
+                <div id="dynamicQuestionsContainer"></div>
+                <button class="btn" onclick="submitEvaluationFinal()" style="margin-top: 20px;">Enviar Evaluación</button>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>Plataforma de Evaluación Estudiantil &copy; 2026</p>
+    </footer>
+    <script src="js/script.js"></script>
 </body>
 </html>
