@@ -1,5 +1,4 @@
 
-// CONFIGURACIÓN DE GOOGLE APPS SCRIPT WEB APP URL
 const API_URL = "https://script.google.com/macros/s/AKfycbxyl21MeLotpz4TCa4VLzp5LIrN-_91pjFxVcaiSRPlwpFxl6H9HGYAfjOGYA3tDM3Gdg/exec";
 
 let currentUser = null;
